@@ -24,7 +24,8 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_GoToCellDialog {
+class Ui_GoToCellDialog
+{
 public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
@@ -35,10 +36,11 @@ public:
     QPushButton *okButton;
     QPushButton *cancelButton;
 
-    void setupUi(QWidget *GoToCellDialog) {
-        if(GoToCellDialog->objectName().isEmpty())
+    void setupUi(QWidget *GoToCellDialog)
+    {
+        if (GoToCellDialog->objectName().isEmpty())
             GoToCellDialog->setObjectName(QStringLiteral("GoToCellDialog"));
-        GoToCellDialog->resize(222, 71);
+        GoToCellDialog->resize(233, 87);
         verticalLayout = new QVBoxLayout(GoToCellDialog);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         horizontalLayout = new QHBoxLayout();
@@ -88,7 +90,8 @@ public:
         QMetaObject::connectSlotsByName(GoToCellDialog);
     } // setupUi
 
-    void retranslateUi(QWidget *GoToCellDialog) {
+    void retranslateUi(QWidget *GoToCellDialog)
+    {
         GoToCellDialog->setWindowTitle(QApplication::translate("GoToCellDialog", "Go To Cell", 0));
         label->setText(QApplication::translate("GoToCellDialog", "&Cell location:", 0));
         okButton->setText(QApplication::translate("GoToCellDialog", "OK", 0));
@@ -98,7 +101,7 @@ public:
 };
 
 namespace Ui {
-class GoToCellDialog : public Ui_GoToCellDialog {};
+    class GoToCellDialog: public Ui_GoToCellDialog {};
 } // namespace Ui
 
 QT_END_NAMESPACE
