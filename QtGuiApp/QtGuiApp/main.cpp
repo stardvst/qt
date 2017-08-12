@@ -1,11 +1,13 @@
-#include <QtWidgets\qapplication.h>
+#include <qapplication.h>
 
-#include "gotocelldialog.h"
+#include "window.h"
 
+int main(int argc, char **argv) {
 
-int main(int argc, char** argv) {
     QApplication app(argc, argv);
-    GoToCellDialog *dialog = new GoToCellDialog;
-    dialog->show();
+
+    Window window;
+    window.show();
+
     return app.exec();
 }
