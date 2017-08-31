@@ -1,13 +1,15 @@
 #include <QApplication>
 
-#include "menus.h"
+#include "ticker.h"
 
 int main(int argc, char **argv) {
 
     QApplication app(argc, argv);
 
-    MainWindow window;
-    window.show();
+    Ticker ticker;
+
+    ticker.setText(QObject::tr("How long it lasted was impossible to say ++ "));
+    ticker.show();
 
     return app.exec();
 }
