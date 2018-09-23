@@ -1,15 +1,24 @@
 #include <QApplication>
+#include "qlayout.h"
+#include "qwidget.h"
 
-#include "ticker.h"
+#include "hexspinbox.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+	QApplication app(argc, argv);
 
-    QApplication app(argc, argv);
+	auto window = new QWidget;
 
-    Ticker ticker;
+	auto hexSpinBox = new HexSpinBox;
 
-    ticker.setText(QObject::tr("How long it lasted was impossible to say ++ "));
-    ticker.show();
+	hexSpinBox->setValue(35);
 
-    return app.exec();
+	auto layout = new QHBoxLayout;
+	layout->addWidget(hexSpinBox);
+	window->setLayout(layout);
+
+	window->show();
+
+	return app.exec();
 }
