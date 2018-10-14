@@ -7,7 +7,7 @@ Window {
 	visible: true
 	color: "red"
 	title: qsTr("Hello World App")
-	
+
 	Rectangle {
 		id: blue
 		anchors.centerIn: parent
@@ -15,25 +15,34 @@ Window {
 		border.color: "#def"
 		border.width: 5
 		radius: 20
-		gradient: Gradient {
-			GradientStop { position: 0.0; color: "lightsteelblue" }
-			GradientStop { position: 1.0; color: "blue" }
+		color: "blue"
+	}
+	
+	MouseArea {
+		id: blueRecMouseArea
+		hoverEnabled: true
+		anchors.fill: blue
+		onClicked: {
+			console.log("Hello from QML!")
+		}
+		onEntered: {
+			blue.color = "brown"
+			blue.rotation = 45
+			fooText.rotation = 45
+		}
+		onExited: {
+			blue.color = "blue"
+			blue.rotation = 0
+			fooText.rotation = 0
 		}
 	}
 
 	Text {
-		anchors.centerIn: blue
+		id: fooText
+		anchors.centerIn: blueRecMouseArea
 		text: "Hello <b>World</b>"
 		color: "white"
 		font.pixelSize: Math.round(blue.height / 3)
-		width: blue.width
 		wrapMode: Text.WordWrap
-	}
-	
-	MouseArea {
-		anchors.fill: parent
-		onClicked: {
-			Qt.quit();
-		}		
 	}
 }
