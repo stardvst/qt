@@ -1,24 +1,21 @@
 #include <QApplication>
-#include "qlayout.h"
-#include "qwidget.h"
-
-#include "hexspinbox.h"
+#include <QFile>
+#include <QTreeView>
+#include "TreeModel.h"
 
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
-	auto window = new QWidget;
+	QFile file(":/column_data.txt");
+	file.open(QIODevice::ReadOnly);
+	TreeModel model(file.readAll());
+	file.close();
 
-	auto hexSpinBox = new HexSpinBox;
-
-	hexSpinBox->setValue(35);
-
-	auto layout = new QHBoxLayout;
-	layout->addWidget(hexSpinBox);
-	window->setLayout(layout);
-
-	window->show();
-
-	return app.exec();
+	QTreeView view;
+	view.setModel(&model);
+	view.setWindowTitle(QObject::tr("Simple Tree Model"));
+	view.show();
+	
+	return QApplication::exec();
 }

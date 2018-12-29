@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="column_data.txt">Resources/column_data.txt</file>
+    </qresource>
+</RCC>
