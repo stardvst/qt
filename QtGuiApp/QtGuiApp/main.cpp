@@ -1,5 +1,4 @@
 #include <QApplication>
-#include <QFile>
 #include <QTreeView>
 #include "TreeModel.h"
 
@@ -7,14 +6,11 @@ int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
-	QFile file(":/column_data.txt");
-	file.open(QIODevice::ReadOnly);
-	TreeModel model(file.readAll());
-	file.close();
-
+	TreeModel model;
 	QTreeView view;
 	view.setModel(&model);
-	view.setWindowTitle(QObject::tr("Simple Tree Model"));
+	view.setWindowTitle(QObject::tr("Simple 1-2-3-4-5 Tree Model"));
+	view.setAnimated(true);
 	view.show();
 	
 	return QApplication::exec();

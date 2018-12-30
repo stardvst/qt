@@ -11,7 +11,7 @@ class TreeModel final : public QAbstractItemModel
 {
 	Q_OBJECT
 public:
-	explicit TreeModel(const QString &data, QObject *parent = nullptr);
+	explicit TreeModel(QObject *parent = nullptr);
 	TreeModel(const TreeModel &other) = delete;
 	TreeModel &operator=(const TreeModel &other) = delete;
 	TreeModel(TreeModel &&other) = delete;
@@ -27,7 +27,7 @@ public:
 	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
 private:
-	void setupModelData(const QStringList &lines, TreeItem *parent);
+	void setupModelData() const;
 
 	TreeItem *m_pRootItem{};
 };

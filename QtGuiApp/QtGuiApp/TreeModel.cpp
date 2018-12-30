@@ -2,14 +2,14 @@
 
 #include "TreeItem.h"
 
-TreeModel::TreeModel(const QString &data, QObject *parent /* = nullptr */)
+TreeModel::TreeModel(QObject *parent /* = nullptr */)
 	: QAbstractItemModel(parent)
 {
-	const auto rootData = QList<QVariant>{} << "Title" << "Summary";
+	const auto rootData = QList<QVariant>{} << "Number";
 	m_pRootItem = new TreeItem{ rootData };
 
 	// only place to add data to model
-	setupModelData(data.split(QStringLiteral("\n" )), m_pRootItem);
+	setupModelData();
 }
 
 TreeModel::~TreeModel()
@@ -97,52 +97,20 @@ QVariant TreeModel::headerData(const int section, const Qt::Orientation orientat
 	return QVariant{};
 }
 
-void TreeModel::setupModelData(const QStringList &lines, TreeItem *parent)
+void TreeModel::setupModelData() const
 {
-	auto parents = QList<TreeItem*>{} << parent;
-	auto indentations = QList<int>{} << 0;;
+	const auto itemOne = new TreeItem({ 1 }, m_pRootItem);
+	m_pRootItem->appendChild(itemOne);
 
-	auto number = 0;
+	const auto itemTwo = new TreeItem({ 2 }, itemOne);
+	itemOne->appendChild(itemTwo);
 
-	while (number < lines.count()) {
-		auto position = 0;
-		while (position < lines[number].length())
-		{
-			if (lines[number].at(position) != ' ')
-				break;
-			position++;
-		}
+	const auto itemThree = new TreeItem({ 3 }, itemTwo);
+	itemTwo->appendChild(itemThree);
 
-		const auto lineData = lines[number].mid(position).trimmed();
-		if (!lineData.isEmpty())
-		{
-			// Read the column data from the rest of the line
-			const auto columnStrings = lineData.split(QStringLiteral("\t"), QString::SkipEmptyParts);
-			QList<QVariant> columnData;
-			for (auto column = 0; column < columnStrings.count(); ++column)
-				columnData << columnStrings[column];
+	const auto itemFour = new TreeItem({ 4 }, m_pRootItem);
+	m_pRootItem->appendChild(itemFour);
 
-			if (position > indentations.last())
-			{
-				// The last child of the current parent is now the new parent
-				// unless the current parent has no children
-				if (parents.last()->childCount())
-				{
-					parents << parents.last()->child(parents.last()->childCount() - 1);
-					indentations << position;
-				}
-			}
-			else {
-				while (position < indentations.last() && !parents.isEmpty()) {
-					parents.pop_back();
-					indentations.pop_back();
-				}
-			}
-
-			// Append a new item to the current parent's list of children
-			parents.last()->appendChild(new TreeItem(columnData, parents.last()));
-		}
-
-		++number;
-	}
+	const auto itemFive = new TreeItem({ 5 }, itemFour);
+	itemFour->appendChild(itemFive);
 }
