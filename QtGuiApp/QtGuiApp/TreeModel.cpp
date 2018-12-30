@@ -5,7 +5,7 @@
 TreeModel::TreeModel(QObject *parent /* = nullptr */)
 	: QAbstractItemModel(parent)
 {
-	const auto rootData = QList<QVariant>{} << "Number";
+	const auto rootData = QVector<QVariant>{} << "Number" << "Data";
 	m_pRootItem = new TreeItem{ rootData };
 
 	// only place to add data to model
@@ -19,15 +19,10 @@ TreeModel::~TreeModel()
 
 QModelIndex TreeModel::index(const int row, const int column, const QModelIndex &parent /* = QModelIndex() */) const
 {
-	if (!hasIndex(row, column, parent))
+	if (parent.isValid() && parent.column() != 0)
 		return QModelIndex{};
 
-	// the parent item pointer
-	const auto parentItem = !parent.isValid()
-		? m_pRootItem
-		: static_cast<TreeItem *>(parent.internalPointer());
-
-	// the child item pointer
+	const auto parentItem = getItem(parent);
 	if (const auto childItem = parentItem->child(row))
 		return createIndex(row, column, childItem);
 
@@ -39,7 +34,7 @@ QModelIndex TreeModel::parent(const QModelIndex &index) const
 	if (!index.isValid())
 		return QModelIndex{};
 
-	const auto childItem = static_cast<TreeItem *>(index.internalPointer());
+	const auto childItem = getItem(index);
 	const auto parentItem = childItem->parentItem();
 
 	// don't return a model index corresponding to the root item
@@ -51,21 +46,13 @@ QModelIndex TreeModel::parent(const QModelIndex &index) const
 
 int TreeModel::rowCount(const QModelIndex &parent /* = QModelIndex() */) const
 {
-	if (parent.column() > 0)
-		return 0;
-
-	const auto parentItem = !parent.isValid()
-		? m_pRootItem
-		: static_cast<TreeItem *>(parent.internalPointer());
-
+	const auto parentItem = getItem(parent);
 	return parentItem->childCount();
 }
 
 int TreeModel::columnCount(const QModelIndex &parent /* = QModelIndex() */) const
 {
-	if (parent.isValid())
-		return static_cast<TreeItem *>(parent.internalPointer())->columnCount();
-
+	// all items have the same number of columns
 	return m_pRootItem->columnCount();
 }
 
@@ -86,7 +73,7 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const
 	if (!index.isValid())
 		return Qt::NoItemFlags;
 
-	return QAbstractItemModel::flags(index);
+	return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
 QVariant TreeModel::headerData(const int section, const Qt::Orientation orientation, const int role /* = Qt::DisplayRole */) const
@@ -99,18 +86,70 @@ QVariant TreeModel::headerData(const int section, const Qt::Orientation orientat
 
 void TreeModel::setupModelData() const
 {
-	const auto itemOne = new TreeItem({ 1 }, m_pRootItem);
-	m_pRootItem->appendChild(itemOne);
+	auto parent = m_pRootItem;
+	parent->insertRows(parent->childCount(), 1, parent->columnCount());
+	const auto itemOne = parent->child(parent->childCount() - 1);
+	itemOne->setData(0, 1);
+	itemOne->setData(1, "First item");
 
-	const auto itemTwo = new TreeItem({ 2 }, itemOne);
-	itemOne->appendChild(itemTwo);
+	parent = itemOne;
+	parent->insertRows(parent->childCount(), 1, parent->columnCount());
+	const auto itemTwo = parent->child(parent->childCount() - 1);
+	itemTwo->setData(0, 2);
+	itemTwo->setData(1, "Second item");
 
-	const auto itemThree = new TreeItem({ 3 }, itemTwo);
-	itemTwo->appendChild(itemThree);
+	parent = itemTwo;
+	parent->insertRows(parent->childCount(), 1, parent->columnCount());
+	const auto itemThree = parent->child(parent->childCount() - 1);
+	itemThree->setData(0, 3);
+	itemThree->setData(1, "Third item");
 
-	const auto itemFour = new TreeItem({ 4 }, m_pRootItem);
-	m_pRootItem->appendChild(itemFour);
+	parent = m_pRootItem;
+	parent->insertRows(parent->childCount(), 1, parent->columnCount());
+	const auto itemFour = parent->child(parent->childCount() - 1);
+	itemFour->setData(0, 4);
+	itemFour->setData(1, "Fourth item");
 
-	const auto itemFive = new TreeItem({ 5 }, itemFour);
-	itemFour->appendChild(itemFive);
+	parent = itemFour;
+	parent->insertRows(parent->childCount(), 1, parent->columnCount());
+	const auto itemFive = parent->child(parent->childCount() - 1);
+	itemFive->setData(0, 5);
+	itemFive->setData(1, "Fifth item");
+}
+
+bool TreeModel::setData(const QModelIndex &index, const QVariant &value, int role /* = Qt::EditRole */)
+{
+	if (role != Qt::EditRole)
+		return false;
+
+	auto item = getItem(index);
+	const auto result = item->setData(index.column(), value);
+	if (result)
+		emit dataChanged(index, index);
+
+	return result;
+}
+
+bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,
+	const QVariant &value, int role)
+{
+	if (role != Qt::EditRole || orientation != Qt::Horizontal)
+		return false;
+
+	const auto result = m_pRootItem->setData(section, value);
+	if (result)
+		emit headerDataChanged(orientation, section, section);
+
+	return result;
+}
+
+TreeItem *TreeModel::getItem(const QModelIndex &index) const
+{
+	if (index.isValid())
+	{
+		if (const auto item = static_cast<TreeItem *>(index.internalPointer()))
+			return item;
+	}
+
+	return m_pRootItem;
 }

@@ -26,8 +26,19 @@ public:
 	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
+	// implement to make the model editable
+	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+	bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
+
+	//// allow the model to change the dimensions
+	//bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+	//bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
+	//bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+	//bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
+
 private:
 	void setupModelData() const;
+	TreeItem *getItem(const QModelIndex &index) const;
 
 	TreeItem *m_pRootItem{};
 };
