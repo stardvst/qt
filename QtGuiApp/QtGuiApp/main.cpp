@@ -1,17 +1,30 @@
 #include <QApplication>
-#include <QTreeView>
-#include "TreeModel.h"
+#include <QStandardItemModel>
+#include <QTableView>
+#include "spinBoxDelegate.h"
 
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
-	TreeModel model;
-	QTreeView view;
-	view.setModel(&model);
-	view.setWindowTitle(QObject::tr("Simple 1-2-3-4-5 Tree Model"));
-	view.setAnimated(true);
-	view.show();
-	
+	QStandardItemModel model(4, 2);
+	QTableView tableView;
+	tableView.setModel(&model);
+
+	SpinBoxDelegate delegate;
+	tableView.setItemDelegate(&delegate);
+
+	for (auto row = 0; row < 4; ++row)
+	{
+		for (auto column = 0; column < 2; ++column)
+		{
+			const auto index = model.index(row, column, {});
+			model.setData(index, QVariant{ (row + 1)*(column + 1) });
+		}
+	}
+
+	tableView.setWindowTitle(QObject::tr("Spin Box Delegate"));
+	tableView.show();
+
 	return QApplication::exec();
 }
