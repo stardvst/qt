@@ -1,30 +1,27 @@
 #include <QApplication>
-#include <QStandardItemModel>
-#include <QTableView>
-#include "spinBoxDelegate.h"
+#include <QTreeWidget>
+#include <QHeaderView>
 
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
-	QStandardItemModel model(4, 2);
-	QTableView tableView;
-	tableView.setModel(&model);
+	QTreeWidget treeWidget;
+	treeWidget.setColumnCount(2);
 
-	SpinBoxDelegate delegate;
-	tableView.setItemDelegate(&delegate);
+	QList<QTreeWidgetItem *> items;
+	for (int i = 0; i < 5; ++i)
+		items.append(new QTreeWidgetItem(&treeWidget,
+			QStringList{ "item", QString("%1").arg(i) }));
+	treeWidget.insertTopLevelItems(0, items);
+	
+	auto header = treeWidget.header();
+	header->setSectionResizeMode(0, QHeaderView::Stretch);
+	header->setSectionResizeMode(1, QHeaderView::Fixed);
+	header->setStretchLastSection(false);
+	header->setDefaultSectionSize(50);
 
-	for (auto row = 0; row < 4; ++row)
-	{
-		for (auto column = 0; column < 2; ++column)
-		{
-			const auto index = model.index(row, column, {});
-			model.setData(index, QVariant{ (row + 1)*(column + 1) });
-		}
-	}
-
-	tableView.setWindowTitle(QObject::tr("Spin Box Delegate"));
-	tableView.show();
+	treeWidget.show();
 
 	return QApplication::exec();
 }
