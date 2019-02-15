@@ -1,27 +1,19 @@
 #include <QApplication>
-#include <QTreeWidget>
-#include <QHeaderView>
+#include "TriangleWindow.h"
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-	QApplication app(argc, argv);
+	QGuiApplication app(argc, argv);
 
-	QTreeWidget treeWidget;
-	treeWidget.setColumnCount(2);
+	QSurfaceFormat format;
+	format.setSamples(16);
 
-	QList<QTreeWidgetItem *> items;
-	for (int i = 0; i < 5; ++i)
-		items.append(new QTreeWidgetItem(&treeWidget,
-			QStringList{ "item", QString("%1").arg(i) }));
-	treeWidget.insertTopLevelItems(0, items);
-	
-	auto header = treeWidget.header();
-	header->setSectionResizeMode(0, QHeaderView::Stretch);
-	header->setSectionResizeMode(1, QHeaderView::Fixed);
-	header->setStretchLastSection(false);
-	header->setDefaultSectionSize(50);
+	TriangleWindow window;
+	window.setFormat(format);
+	window.resize(640, 480);
+	window.show();
 
-	treeWidget.show();
+	window.setAnimating(true);
 
 	return QApplication::exec();
 }
