@@ -1,8 +1,6 @@
 #include <QApplication>
 #include <QMessageBox>
-#include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlQuery>
+#include <QtSql>
 #include <QDebug>
 
 bool createConnection()
@@ -18,66 +16,59 @@ bool createConnection()
 		return false;
 	}
 
+	auto driver = QSqlDatabase::database().driver();
+	if (driver->hasFeature(QSqlDriver::Transactions))
+		driver->beginTransaction();
+
 	QSqlQuery query;
-	if (db.tables().contains("artist"))
-		query.exec("DROP TABLE artist;");
 
-	if (!query.exec("CREATE TABLE artist (ID integer primary key, Name varchar, Age integer);"))
+	QSqlTableModel model(nullptr, db);
+	model.setTable("artist");
+	model.setFilter("Name = 'Billie Eilish'");
+	model.select();
+
+	auto id = 0;
+	if (model.rowCount())
+		id = model.record(0).value("ID").toInt();
+
+	if (!db.tables().contains("albums"))
 	{
-		qDebug() << query.lastError().text();
-		return false;
+		if (!query.exec(
+			"CREATE TABLE albums(ID INTEGER PRIMARY KEY AUTOINCREMENT, Title VARCHAR, ArtistID INTEGER,"
+			"FOREIGN KEY (ArtistID)"
+			"REFERENCES artist(ID));"))
+		{
+			qDebug() << query.lastError().text();
+			return false;
+		}
 	}
 
-	/*
-	 * Oracle-syntax
-	 */
-	//if (!query.prepare(QLatin1String("INSERT INTO artist (Name, Age) VALUES(:Name, :Age); ")))
-	//{
-	//	qDebug() << query.lastError().text();
-	//	return false;
-	//}
+	model.setTable("albums");
+	int row = 0;
+	model.insertRow(row);
+	model.setData(model.index(row, 0), 1);
+	model.setData(model.index(row, 1), QLatin1String("When we all fall asleep, where do we go?"));
+	model.setData(model.index(row, 2), id);
+	model.submitAll();
 
-	//query.bindValue(":Name", QLatin1String("Billie Eilish"));
-	//query.bindValue(":Age", 17);
-	//query.exec();
-
-	//query.bindValue(":Name", QLatin1String("Demi Lovato"));
-	//query.bindValue(":Age", 26);
-	//query.exec();
-
-	//query.bindValue(":Name", QLatin1String("Christina Perri"));
-	//query.bindValue(":Age", 32);
-	//query.exec();
-
-	/*
-	 * ODBC-style
-	 */
-	if (!query.prepare(QLatin1String("INSERT INTO artist (Name, Age) VALUES(?, ?); ")))
+	model.select();
+	if (model.rowCount())
 	{
-		qDebug() << query.lastError().text();
-		return false;
+		auto record = model.record(0);
+		model.setTable("artist");
+		model.setFilter(QString("ID = %1").arg(id));
+		model.select();
+		if (model.rowCount())
+		{
+			qDebug()
+				<< record.value("ID").toInt()
+				<< model.record(0).value("Name").toString()
+				<< record.value("Title").toString();
+		}
 	}
 
-	query.addBindValue(QLatin1String("Billie Eilish"));
-	query.addBindValue(17);
-	query.exec();
-
-	query.addBindValue(QLatin1String("Demi Lovato"));
-	query.addBindValue(26);
-	query.exec();
-
-	query.addBindValue(QLatin1String("Christina Perri"));
-	query.addBindValue(32);
-	query.exec();
-
-	query.exec("SELECT Name, Age FROM artist WHERE Age >= 20;");
-	
-	while (query.next())
-	{
-		const QString artistName = query.value(0).toString();
-		const int artistAge = query.value(1).toInt();
-		qDebug() << artistName << ' ' << artistAge;
-	}
+	if (driver->hasFeature(QSqlDriver::Transactions))
+		driver->commitTransaction();
 
 	return true;
 }
