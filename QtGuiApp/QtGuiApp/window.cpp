@@ -1,30 +1,42 @@
-#include <qapplication.h>
-#include <qpushbutton.h>
-
+#include "filelistmodel.h"
 #include "window.h"
 
-Window::Window(QWidget *parent) : QWidget(parent) {
+#include <QtWidgets>
 
-    setFixedSize(100, 50);
+Window::Window(QWidget *parent)
+	: QWidget(parent)
+{
+	FileListModel *model = new FileListModel(this);
+	model->setDirPath(QLibraryInfo::location(QLibraryInfo::PrefixPath));
 
-    m_button = new QPushButton("Hello World", this);
-    m_button->setGeometry(10, 10, 80, 30);
-    m_button->setCheckable(true);
+	QLabel *label = new QLabel(tr("&Directory:"));
+	QLineEdit *lineEdit = new QLineEdit;
+	label->setBuddy(lineEdit);
 
-    m_counter = 0;
+	QListView *view = new QListView;
+	view->setModel(model);
 
-    connect(m_button, SIGNAL(clicked(bool)), this, SLOT(slotButtonClicked(bool)));
-    connect(this, SIGNAL(counterReached()), QApplication::instance(), SLOT(quit()));
+	logViewer = new QTextBrowser;
+	logViewer->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+
+	connect(lineEdit, &QLineEdit::textChanged,
+		model, &FileListModel::setDirPath);
+	connect(lineEdit, &QLineEdit::textChanged,
+		logViewer, &QTextEdit::clear);
+	connect(model, &FileListModel::numberPopulated,
+		this, &Window::updateLog);
+
+	QGridLayout *layout = new QGridLayout;
+	layout->addWidget(label, 0, 0);
+	layout->addWidget(lineEdit, 0, 1);
+	layout->addWidget(view, 1, 0, 1, 2);
+	layout->addWidget(logViewer, 2, 0, 1, 2);
+
+	setLayout(layout);
+	setWindowTitle(tr("Fetch More Example"));
 }
 
-void Window::slotButtonClicked(bool checked) {
-    if(checked) {
-        m_button->setText("Checked");
-    } else {
-        m_button->setText("Hello World");
-    }
-
-    if(++m_counter == 10) {
-        emit counterReached();
-    }
+void Window::updateLog(int number)
+{
+	logViewer->append(tr("%1 items added.").arg(number));
 }

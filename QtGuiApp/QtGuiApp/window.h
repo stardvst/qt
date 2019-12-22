@@ -1,26 +1,19 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
-#include <QtWidgets/qwidget.h>
+#include <QWidget>
 
-class QPushButton;
+class QTextBrowser;
 
-class Window : public QWidget {
-
-    Q_OBJECT
+class Window : public QWidget
+{
+	Q_OBJECT
 
 public:
-    explicit Window(QWidget *parent = nullptr);
+	Window(QWidget *parent = nullptr);
 
-signals:
-    void counterReached();
-
-    private slots:
-    void slotButtonClicked(bool checked);
+public slots:
+	void updateLog(int number);
 
 private:
-    int m_counter;
-    QPushButton *m_button;
+	QTextBrowser *logViewer = nullptr;
 };
-
-#endif // WINDOW_H
