@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file alias="column_data.txt">Resources/column_data.txt</file>
+        <file alias="butterfly">Resources/butterfly.png</file>
+        <file alias="checker">Resources/checker.png</file>
     </qresource>
 </RCC>

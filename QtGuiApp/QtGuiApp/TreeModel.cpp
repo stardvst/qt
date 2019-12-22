@@ -113,7 +113,7 @@ void TreeModel::setupModelData() const
 	parent = itemFour;
 	parent->insertRows(parent->childCount(), 1, parent->columnCount());
 	const auto itemFive = parent->child(parent->childCount() - 1);
-	itemFive->setData(0, 5);
+	itemFive->setData(0, QString::fromStdString(std::string(100, 'a') + "\naaa"));
 	itemFive->setData(1, "Fifth item");
 }
 
