@@ -1,14 +1,11 @@
 #include <QApplication>
-#include <QWidget>
-#include <QDebug>
-#include <QPushButton>
 
-#include "window.h"
+#include "transform.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
-	Window w;
+	Widget w;
 	w.show();
 	return app.exec();
 }
