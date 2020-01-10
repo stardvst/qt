@@ -16,6 +16,10 @@ Window {
 		border.width: 5
 		radius: 20
 		color: "blue"
+		gradient: Gradient {
+			GradientStop { position: 0.0; color: "lightsteelblue" }
+			GradientStop { position: 1.0; color: "slategray" }
+		}
 	}
 	
 	MouseArea {
